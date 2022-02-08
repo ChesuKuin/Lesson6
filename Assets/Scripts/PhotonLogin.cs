@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
 public class PhotonLogin : MonoBehaviourPunCallbacks
@@ -21,14 +23,14 @@ public class PhotonLogin : MonoBehaviourPunCallbacks
 
     public void Connect()
     {
-        if (PhotonNetwork.IsConnected)
-        {
-            PhotonNetwork.JoinRandomRoom();
-        }
-        else
-        {
+        if (!PhotonNetwork.IsConnected)
             PhotonNetwork.ConnectUsingSettings();
-        }
+    }
+
+    public override void OnConnectedToMaster()
+    {
+        base.OnConnectedToMaster();
+        PhotonNetwork.JoinRandomRoom();
     }
 
     public void UpdateRoomName(string roomName)
@@ -38,7 +40,7 @@ public class PhotonLogin : MonoBehaviourPunCallbacks
     
     public void OnCreateRoomButtonClicked()
     {
-        PhotonNetwork.CreateRoom(_roomName);
+        PhotonNetwork.JoinRandomOrCreateRoom();
     }
     
     public override void OnCreateRoomFailed(short returnCode, string message)
@@ -55,6 +57,18 @@ public class PhotonLogin : MonoBehaviourPunCallbacks
             var newElement = Instantiate(element, element.transform.parent);
             newElement.gameObject.SetActive(true);
             newElement.SetItem(p);
+        }
+    }
+    
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        createRoomPanel.SetActive(false);
+        playerList.SetActive(true);
+        foreach (var p in roomList)
+        {
+            var newElement = Instantiate(element, element.transform.parent);
+            newElement.gameObject.SetActive(true);
+            newElement.SetItem(p.Name);
         }
     }
     
