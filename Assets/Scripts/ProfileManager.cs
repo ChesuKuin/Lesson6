@@ -1,4 +1,4 @@
-using System;
+using System.Globalization;
 using PlayFab;
 using PlayFab.ClientModels;
 using UnityEngine;
@@ -8,32 +8,18 @@ using UnityEngine.UI;
 public class ProfileManager : MonoBehaviour
 {
     [SerializeField] private Text nickname;
-    [SerializeField] private GameObject[] _interactiveObjects;
+    [SerializeField] private Text id;
+    [SerializeField] private Text created;
     
     private string _inputText;
 
     private void Start()
     {
-        Array.ForEach(_interactiveObjects, go => go.SetActive(false));
-
         PlayFabClientAPI.GetPlayerProfile(new GetPlayerProfileRequest(), success =>
         {
             nickname.text = $"Player Name: {success.PlayerProfile.DisplayName}";
-
-            PlayFabClientAPI.GetUserData(new GetUserDataRequest
-            {
-                PlayFabId = success.PlayerProfile.PlayerId,
-                Keys = null
-            }, result =>
-            {
-                var userHealth = int.Parse(result.Data["Health"].Value);
-                var playerHealth = Resources.Load<PlayerHealth>(nameof(PlayerHealth));
-                playerHealth.health = userHealth;
-                Array.ForEach(_interactiveObjects, go => go.SetActive(userHealth > 0));
-            }, error =>
-            {
-                Debug.Log("Got error retrieving user data:");
-            });
+            // id.text = $"Player ID: {success.AccountInfo.PlayFabId}";
+            // created.text = $"Creation time: {success.AccountInfo.Created.ToString(CultureInfo.CurrentCulture)}";
         }, Debug.LogError);
     }
 

@@ -23,8 +23,14 @@ public class PhotonLogin : MonoBehaviourPunCallbacks
 
     public void Connect()
     {
-        if (!PhotonNetwork.IsConnected)
+        if (PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.JoinRandomRoom();
+        }
+        else
+        {
             PhotonNetwork.ConnectUsingSettings();
+        }
     }
 
     public override void OnConnectedToMaster()
